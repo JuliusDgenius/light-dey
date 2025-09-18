@@ -95,6 +95,7 @@ venv.bak
 .idea/
 .vscode/
 .dx/
+.idx/
 
 # Miscellaneous
 .swp
