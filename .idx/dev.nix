@@ -10,6 +10,7 @@
     pkgs.bashInteractive
     # C compiler and build tools for pyenv
     pkgs.gcc
+    pkgs.gnumake
     pkgs.zlib
     pkgs.openssl
     pkgs.bzip2

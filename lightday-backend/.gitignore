@@ -96,6 +96,7 @@ venv.bak
 .vscode/
 .dx/
 .idx/
+.idx/dev.nix
 
 # Miscellaneous
 .swp
