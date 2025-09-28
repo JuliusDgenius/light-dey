@@ -1,37 +1,39 @@
-from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .serializers import UserCreateSerializer, UserSerializer
-
-
-User = get_user_model()
-
-
-class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = User.EMAIL_FIELD
-
-    def validate(self, attrs):
-        email = attrs.get("email") or attrs.get("username")
-        if email and "username" not in attrs:
-            attrs["username"] = email
-        return super().validate(attrs)
+from .models import User
+from .serializers import UserRegisterSerializer, UserProfileSerializer
 
 
 class EmailTokenObtainPairView(TokenObtainPairView):
-    serializer_class = EmailTokenObtainPairSerializer
+    """
+    Custom view for obtaining a token pair (access and refresh) using email.
+    """
+    # Since the User model's USERNAME_FIELD is 'email', 
+    # the default TokenObtainPairSerializer will work correctly
+    # by expecting 'email' and 'password' fields in the request.
+    pass
 
-
-class RegisterView(generics.CreateAPIView):
-    serializer_class = UserCreateSerializer
+class UserRegisterView(generics.CreateAPIView):
+    """
+    View for registering a new user. Publicly accessible.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
 
 
-class MeView(APIView):
+class UserProfileView(generics.RetrieveAPIView):
+    """
+    View to retrieve the profile of the currently authenticated user.
+    Requires authentication.
+    """
+    serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        return Response(UserSerializer(request.user).data)
+    def get_object(self):
+        """
+        Returns the authenticated user associated with the request.
+        """
+        return self.request.user

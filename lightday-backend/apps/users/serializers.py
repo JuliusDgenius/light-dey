@@ -1,27 +1,38 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from .models import User
 
+class UserRegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration.
 
-User = get_user_model()
-
-
-class UserSerializer(serializers.ModelSerializer):
+    Handles validation and creation of a new user, including password hashing.
+    """
     class Meta:
         model = User
-        fields = ["id", "username", "email", "location", "date_joined"]
-        read_only_fields = ["id", "date_joined"]
-
-
-class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
-
-    class Meta:
-        model = User
-        fields = ["username", "email", "password", "location"]
+        fields = ("id", "username", "email", "password", "location")
+        extra_kwargs = {
+            "password": {"write_only": True}, # Ensure password is not sent back
+        }
 
     def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
+        """
+        Create and return a new user instance, given the validated data.
+        This method overrides the default to handle password hashing.
+        """
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+            location=validated_data.get("location")
+        )
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for representing a user's profile.
+
+    Excludes sensitive information like the password.
+    """
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "location", "date_joined")

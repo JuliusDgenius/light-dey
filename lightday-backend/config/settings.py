@@ -1,3 +1,4 @@
+
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -123,8 +124,11 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if not DEBUG else []
 
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    "https://8000-firebase-light-dey-1758098425882.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev",
+]
+
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
